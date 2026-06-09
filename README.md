@@ -50,3 +50,44 @@ Given an audio recording of a vehicle's mechanical sound, classify it into one o
 ## 🏗️ Architecture Highlights
 
 ### Mixture-of-Experts (Hierarchical)
+Input Audio → Gating Model (3 states) → Expert Model (fault)
+↓
+braking_state → [normal_brakes, worn_out_brakes]
+idle_state → [low_oil, normal_idle, power_steering, serpentine_belt]
+startup_state → [bad_ignition, dead_battery, normal_startup]
+
+
+### Ensemble Voting
+- **Voters:** XGBoost (MFCCs) + MoE PANNs + MoE XGBoost
+- **Rule:** Unanimous → that class; 2-of-3 → majority; Tie → summed probabilities
+- **Result:** 91.5% accuracy (3% improvement over best single model)
+
+## 📊 Results
+
+### Performance Comparison
+Model Accuracy Weighted F1
+───────────────────────────────────────────────────────
+XGBoost (MFCCs) 0.8851 0.8827
+PANNs CNN14 0.8615 0.8614
+Mixture-of-Experts (XGB) 0.8649 0.8648
+Ensemble Vote (Top-3) 0.9155 0.9142
+Mixture-of-Experts (PANNs) 0.8378 0.8388
+YAMNet Transfer Learning 0.7905 0.7904
+CNN-LSTM Hybrid 0.1453 0.0803
+CNN (Mel Spectrogram) 0.0811 0.0391
+
+
+### Per-Class Performance (Ensemble)
+
+| Class | Precision | Recall | F1-Score |
+|-------|-----------|--------|----------|
+| bad_ignition | 0.96 | 0.86 | 0.91 |
+| dead_battery | 0.96 | 1.00 | 0.98 |
+| low_oil | 0.82 | 0.72 | 0.77 |
+| normal_brakes | 0.85 | 1.00 | 0.92 |
+| normal_engine_idle | 0.93 | 1.00 | 0.96 |
+| normal_engine_startup | 0.87 | 0.96 | 0.91 |
+| power_steering | 0.92 | 0.87 | 0.89 |
+| serpentine_belt | 1.00 | 0.94 | 0.97 |
+| worn_out_brakes | 0.94 | 0.88 | 0.91 |
+
