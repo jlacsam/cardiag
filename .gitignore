@@ -8,3 +8,7 @@ online_sources/
 other_data/
 __pycache__/
 visualizations/
+.ipynb_checkpoints/
+__pycache__/
+*.pyc
+.env
